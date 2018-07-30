@@ -1,14 +1,13 @@
 {{- if .Values.ingress.enabled -}}
-{{- $fullName := include "hotels.fullname" . -}}
-{{- $servicePort := .Values.service.port -}}
-{{- $ingressPath := .Values.ingress.path -}}
+{{- $fullName := include "sh360-hotels.fullname" . -}}
+{{- $ingressPath := .Values.pathBase -}}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: {{ $fullName }}
   labels:
-    app: {{ template "hotels.name" . }}
-    chart: {{ template "hotels.chart" . }}
+    app: {{ template "sh360-hotels.name" . }}
+    chart: {{ template "sh360-hotels.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 {{- with .Values.ingress.annotations }}

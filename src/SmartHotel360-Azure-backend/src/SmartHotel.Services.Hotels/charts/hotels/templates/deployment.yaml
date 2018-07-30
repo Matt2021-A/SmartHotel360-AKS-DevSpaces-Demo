@@ -1,63 +1,63 @@
+{{- $name := include "sh360-hotels.fullname" . -}}
+{{- $cfgname := printf "%s-%s" "cfg" $name -}}
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: {{ template "hotels.fullname" . }}
+  name: {{ template "sh360-hotels.fullname" . }}
   labels:
-    app: {{ template "hotels.name" . }}
-    chart: {{ template "hotels.chart" . }}
+    ufo: {{ $cfgname}}
+    app: {{ template "sh360-hotels.name" . }}
+    chart: {{ template "sh360-hotels.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ template "hotels.name" . }}
+      app: {{ template "sh360-hotels.name" . }}
       release: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: {{ template "hotels.name" . }}
+        app: {{ template "sh360-hotels.name" . }}
         release: {{ .Release.Name }}
     spec:
+      {{ if .Values.imagePullSecrets -}}
+      imagePullSecrets:
+      {{ range .Values.imagePullSecrets -}}
+        - name: {{ .name }}
+      {{- end -}}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: PATH_BASE
+              value: {{ .Values.pathBase  }}
+            - name: k8sname
+              value: {{ .Values.clusterName }}
+          {{- if .Values.env.values -}}
+          {{- range .Values.env.values }}
+            - name: {{ .name }}
+              value: {{ .value | quote }}
+          {{- end -}}
+          {{- end -}}
+          {{- if .Values.env.configmap -}}
+          {{- range .Values.env.configmap }}
+            - name: {{ .name }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $cfgname }}
+                  key: {{ .key }}
+          {{- end -}}
+          {{- end }}
           ports:
             - name: http
               containerPort: 80
               protocol: TCP
-          # livenessProbe:
-          #   httpGet:
-          #     path: /
-          #     port: http
-          # readinessProbe:
-          #   httpGet:
-          #     path: /
-          #     port: http
-          env:
-            - name: k8sname
-              value: smarthotel360
-            - name: PATH_BASE
-              value: /hotels-api
-            - name: discountsvc
-              value: http://discounts/
-            {{- $root := . }}
-            {{- range $ref, $values := .Values.secrets }}
-            {{- range $key, $value := $values }}
-            - name: {{ $ref }}_{{ $key }}
-              valueFrom:
-                secretKeyRef:
-                  name: {{ template "hotels.fullname" $root }}-{{ $ref | lower }}
-                  key: {{ $key }}
-            {{- end }}
-            {{- end }}
           resources:
 {{ toYaml .Values.resources | indent 12 }}
-    {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-{{ toYaml . | indent 8 }}
-    {{- end }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
@@ -70,3 +70,4 @@ spec:
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}
+

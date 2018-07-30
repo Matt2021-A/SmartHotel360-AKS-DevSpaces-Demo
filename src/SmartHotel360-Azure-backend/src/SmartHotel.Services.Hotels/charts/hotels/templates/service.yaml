@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "hotels.fullname" . }}
+  name: {{ template "sh360-hotels.fullname" . }}
   labels:
-    app: {{ template "hotels.name" . }}
-    chart: {{ template "hotels.chart" . }}
+    app: {{ template "sh360-hotels.name" . }}
+    chart: {{ template "sh360-hotels.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
@@ -15,5 +15,5 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app: {{ template "hotels.name" . }}
+    app: {{ template "sh360-hotels.name" . }}
     release: {{ .Release.Name }}
