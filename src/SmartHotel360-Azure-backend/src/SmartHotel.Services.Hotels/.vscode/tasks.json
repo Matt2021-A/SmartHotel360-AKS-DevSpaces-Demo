@@ -1,13 +1,12 @@
 {
     "tasks": [
         {
-            "label": "build (AZDS)",
+            "label": "azds: prelaunch",
             "command": "azds",
             "args": [
                 "up",
-                "--iterate",
-                "--no-command",
-                "--no-telemetry"
+                "--await-exec",
+                "--keep-alive"
             ],
             "options": {
                 "cwd": "${workspaceRoot}"
