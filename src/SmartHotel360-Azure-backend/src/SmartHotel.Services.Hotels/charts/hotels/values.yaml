@@ -35,7 +35,7 @@ affinity: {}
 mssql:
   user: sa
   pwd: Password!
-#  host: sh360-sql-data    ## This host name overrides the generated one
+  host: sql-data.default    ## This host name overrides the generated one
 
 # env defines the environment variables that will be declared in the pod
 env:
