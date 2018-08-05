@@ -1,0 +1,22 @@
+queue: Hosted Linux Preview
+variables:
+  app.name: hotels
+
+steps:
+- task: AzureCLI@1
+  displayName: Login to Azure
+  inputs:
+    azureSubscription: $(az.subid)
+    scriptLocation: inlineScript
+    inlineScript: |
+      az aks get-credentials -n $(aks.name) -g $(aks.rg)
+      az acr login -n $(acr.name) -g $(acr.rg)
+- script: |
+    docker build -t $(registry.host)/$(registry.org)/$(app.name):$BUILD_BUILDID -f SmartHotel.Services.Hotels/Dockerfile .
+    docker push $(registry.host)/$(registry.org)/$(app.name):$BUILD_BUILDID
+  displayName: Build and push
+  workingDirectory: $(Build.SourcesDirectory)/src/SmartHotel360-Azure-backend/src
+- script: |
+    helm upgrade --install --reuse-values sh360-hotels SmartHotel.Services.Hotels/charts/hotels --set image.tag=$BUILD_BUILDID
+  displayName: Helm upgrade
+  workingDirectory: $(Build.SourcesDirectory)/src/SmartHotel360-Azure-backend/src
