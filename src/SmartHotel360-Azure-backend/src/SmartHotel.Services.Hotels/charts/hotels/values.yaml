@@ -63,5 +63,3 @@ env:
   values:
     - name: ASPNETCORE_ENVIRONMENT
       value: Development
-
-fullnameOverride: sh360-hotels
