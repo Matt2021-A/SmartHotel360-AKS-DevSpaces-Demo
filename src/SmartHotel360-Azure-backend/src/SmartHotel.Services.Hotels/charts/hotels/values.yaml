@@ -63,3 +63,6 @@ env:
   values:
     - name: ASPNETCORE_ENVIRONMENT
       value: Development
+
+# override service name to match service in default ns
+fullnameOverride: sh360-hotels
